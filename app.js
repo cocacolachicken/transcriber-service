@@ -31,6 +31,10 @@ app.use(async (req, res, next) => {
     next()
 })
 
+app.get("/", (req, res) => {
+    res.send("ok!");
+})
+
 app.post("/", upload.single('audio'), async (req, res) => {
     try {
         const job_id = (Math.random()).toString(36).substring(2)
