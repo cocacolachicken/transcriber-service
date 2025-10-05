@@ -32,13 +32,17 @@ app.use(async (req, res, next) => {
 })
 
 app.post("/", upload.single('audio'), async (req, res) => {
-    const job_id = (Math.random()).toString(36).substring(2)
+    try {
+        const job_id = (Math.random()).toString(36).substring(2)
 
-    const audio = new Blob([req.file.buffer], {type : req.file.mimetype})
+        const audio = new Blob([req.file.buffer], {type: req.file.mimetype})
 
-    const transcript = await interpretAudio(audio)
+        const transcript = await interpretAudio(audio)
 
-    res.render(transcript);
+        res.render("transcript", {transtext: transcript.text});
+    } catch (ignored) {
+        res.render("transcript", {transtext: ""})
+    }
 })
 
 app.listen(3069, ()=> {
