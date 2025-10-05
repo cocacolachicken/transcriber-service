@@ -45,7 +45,7 @@ app.post("/", upload.single('audio'), async (req, res) => {
     }
 })
 
-app.listen(3069, ()=> {
+app.listen(process.env.PORT, ()=> {
     console.log("now listening!");
 })
 
