@@ -1,0 +1,47 @@
+const express = require('express')
+const { ElevenLabsClient } = require('@elevenlabs/elevenlabs-js')
+require("dotenv/config")
+const app = express()
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() })
+const elevenlabs = new ElevenLabsClient();
+
+app.set("view engine", 'ejs')
+
+async function interpretAudio (audioBlob) {
+    const transcription = await elevenlabs.speechToText.convert({
+        file: audioBlob,
+        modelId: "scribe_v1", // Model to use, for now only "scribe_v1" is supported.
+        tagAudioEvents: true, // Tag audio events like laughter, applause, etc.
+        languageCode: "eng", // Language of the audio file. If set to null, the model will detect the language automatically.
+        diarize: true, // Whether to annotate who is speaking
+
+    })
+
+    console.log(transcription)
+
+    return transcription
+}
+
+app.use(async (req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    next()
+})
+
+app.post("/", upload.single('audio'), async (req, res) => {
+    const job_id = (Math.random()).toString(36).substring(2)
+
+    const audio = new Blob([req.file.buffer], {type : req.file.mimetype})
+
+    const transcript = await interpretAudio(audio)
+
+    res.render(transcript);
+})
+
+app.listen(3069, ()=> {
+    console.log("now listening!");
+})
+
