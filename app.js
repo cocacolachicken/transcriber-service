@@ -40,8 +40,8 @@ app.post("/", upload.single('audio'), async (req, res) => {
         const transcript = await interpretAudio(audio)
 
         res.render("transcript", {transtext: transcript.text});
-    } catch (ignored) {
-        res.render("transcript", {transtext: ""})
+    } catch (e) {
+        res.render("transcript", {transtext: JSON.stringify(e)})
     }
 })
 
